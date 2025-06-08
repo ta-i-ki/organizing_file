@@ -6,8 +6,8 @@ use std::path::{ Path, PathBuf };
 use walkdir::WalkDir;
 
 fn get_category(extension: &str) -> &str {
-    match extension.to_lowercase().as_str() {
-        ".pdf" | ".doc" | ".docx" | ".txt" | ".xlsx" | ".pptx" | ".md" => "ドキュメント",
+    match extension {
+        ".md" | ".pdf" | ".doc" | ".docx" | ".txt" | ".xlsx" | ".pptx" => "ドキュメント",
         ".jpg" | ".jpeg" | ".png" | ".gif" | ".bmp" => "画像",
         ".mp4" | ".mov" | ".avi" | ".mkv" => "動画",
         ".mp3" | ".wav" | ".m4a" => "音声",
@@ -34,7 +34,8 @@ fn create_unique_path(mut path: PathBuf) -> PathBuf {
 }
 
 fn sort_files(user_name: &str) -> io::Result<()> {
-    let download_path = Path::new("C:/Users").join(user_name).join("Downloads");
+    //let download_path = Path::new("C:/Users").join(user_name).join("Downloads");
+    let download_path = Path::new("C:/Users").join(user_name).join("Documents");
     let sorted_base = Path::new("C:/Users").join(user_name).join("sorted_downloads");
 
     if !download_path.exists() {
@@ -47,17 +48,18 @@ fn sort_files(user_name: &str) -> io::Result<()> {
         let path = entry.path();
 
         if path.is_file() {
-            let extension = path
-                .extension()
-                .and_then(|e| e.to_str())
-                .unwrap_or("");
-            let category = get_category(extension);
-            let dest_dir = sorted_base.join(category);
-            fs::create_dir_all(&dest_dir)?;
+            if let Some(ext_osstr) = path.extension() {
+                if let Some(ext_str) = ext_osstr.to_str() {
+                    let ext = format!(".{}", ext_str.to_lowercase());
+                    let category = get_category(&ext);
+                    let dest_dir = sorted_base.join(category);
+                    fs::create_dir_all(&dest_dir)?;
 
-            let dest_path = create_unique_path(dest_dir.join(path.file_name().unwrap()));
-            fs::rename(&path, &dest_path)?;
-            println!("✔ 移動: {:?} → {:?}", path.file_name().unwrap(), dest_path);
+                    let dest_path = create_unique_path(dest_dir.join(path.file_name().unwrap()));
+                    fs::rename(&path, &dest_path)?;
+                    println!("✔ 移動: {:?} → {:?}", path.file_name().unwrap(), dest_path);
+                }
+            }
         }
     }
     Ok(())
