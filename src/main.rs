@@ -34,8 +34,8 @@ fn create_unique_path(mut path: PathBuf) -> PathBuf {
 }
 
 fn sort_files(user_name: &str) -> io::Result<()> {
-    //let download_path = Path::new("C:/Users").join(user_name).join("Downloads");
-    let download_path = Path::new("C:/Users").join(user_name).join("Documents");
+    let download_path = Path::new("C:/Users").join(user_name).join("Downloads");
+    // let download_path = Path::new("C:/Users").join(user_name).join("Documents");
     let sorted_base = Path::new("C:/Users").join(user_name).join("sorted_downloads");
 
     if !download_path.exists() {
